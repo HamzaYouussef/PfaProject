@@ -4,20 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import AppLayout from "../components/layout/AppLayout"
 import Button from "../components/ui/Button"
-import {
-  Search,
-  UserPlus,
-  Frown,
-  User,
-  Mail,
-  ChevronDown,
-  Edit,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  AlertTriangle,
-} from "lucide-react"
+import { Search, UserPlus, Frown, User, Mail, ChevronDown, Edit, Trash2, ChevronLeft, ChevronRight, X, AlertTriangle, Users } from 'lucide-react'
 
 interface UserData {
   id: number
@@ -50,16 +37,16 @@ const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([
     { id: 1, nom: "Jean Dupont", email: "jean.dupont@email.com", role: "admin" },
     { id: 2, nom: "Marie Martin", email: "marie.martin@email.com", role: "user" },
-    { id: 3, nom: "Pierre Durand", email: "pierre.durand@email.com", role: "user" },
+    { id: 3, nom: "Pierre Durand", email: "pierre.durand@email.com", role: "editor" },
     { id: 4, nom: "Sophie Bernard", email: "sophie.bernard@email.com", role: "user" },
     { id: 5, nom: "Antoine Moreau", email: "antoine.moreau@email.com", role: "admin" },
-    { id: 6, nom: "Bachir Feki", email: "camille.petit@email.com", role: "user" },
+    { id: 6, nom: "Camille Petit", email: "camille.petit@email.com", role: "editor" },
     { id: 7, nom: "Lucas Robert", email: "lucas.robert@email.com", role: "user" },
     { id: 8, nom: "Emma Richard", email: "emma.richard@email.com", role: "user" },
-    { id: 9, nom: "Thomas Dubois", email: "thomas.dubois@email.com", role: "admin" },
+    { id: 9, nom: "Thomas Dubois", email: "thomas.dubois@email.com", role: "editor" },
     { id: 10, nom: "Julie Garcia", email: "julie.garcia@email.com", role: "admin" },
     { id: 11, nom: "Alexandre Roux", email: "alexandre.roux@email.com", role: "user" },
-    { id: 12, nom: "Léa Fournier", email: "lea.fournier@email.com", role: "user" },
+    { id: 12, nom: "Léa Fournier", email: "lea.fournier@email.com", role: "editor" },
     { id: 13, nom: "Nicolas Girard", email: "nicolas.girard@email.com", role: "user" },
     { id: 14, nom: "Chloé André", email: "chloe.andre@email.com", role: "admin" },
     { id: 15, nom: "Maxime Lefebvre", email: "maxime.lefebvre@email.com", role: "user" },
@@ -184,13 +171,15 @@ const UsersPage: React.FC = () => {
     }
   }
 
-  const roles = ["all", "admin", "user"]
-  const roleOptions = ["admin", "user"]
+  const roles = ["all", "admin", "user", "editor"]
+  const roleOptions = ["admin", "user", "editor"]
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "admin":
         return "bg-red-100 text-red-800"
+      case "editor":
+        return "bg-yellow-100 text-yellow-800"
       case "user":
         return "bg-green-100 text-green-800"
       default:
@@ -200,56 +189,77 @@ const UsersPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header with gradient text */}
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
               User Management
             </h1>
-            <div className="flex items-center mt-2 text-gray-600">
-              <User className="h-5 w-5 mr-2 text-blue-500" />
-              <p>Manage all registered users and their permissions</p>
-            </div>
+            <p className="mt-2 text-gray-600">Manage all registered users and their permissions</p>
           </div>
-          <div>
+          <div className="mt-2 md:mt-0">
             <Button icon={<UserPlus className="h-4 w-4" />} variant="primary" onClick={openCreateModal}>
               Add User
             </Button>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div className="relative">
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {roles.map((role) => (
-                <option key={role} value={role}>
-                  {role === "all" ? "All Roles" : role.charAt(0).toUpperCase() + role.slice(1)}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+        {/* Search and Filters Card */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all hover:shadow-md mb-6">
+          <div className="p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Search className="h-5 w-5 text-indigo-600" />
+                Search Users
+              </h2>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              </div>
+              <div className="relative w-full sm:w-48">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  {roles.map((role) => (
+                    <option key={role} value={role}>
+                      {role === "all" ? "All Roles" : role.charAt(0).toUpperCase() + role.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
+        {/* Users Table Card */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-4 sm:p-6 pb-0">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="h-5 w-5 text-indigo-600" />
+                Users List
+              </h2>
+              <span className="text-sm text-gray-500">
+                {filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"} found
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Table View (hidden on small screens) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -276,8 +286,8 @@ const UsersPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-8 w-8">
-                            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                              <User className="h-4 w-4 text-blue-600" />
+                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                              <User className="h-4 w-4 text-indigo-600" />
                             </div>
                           </div>
                           <div className="ml-3">
@@ -302,7 +312,7 @@ const UsersPage: React.FC = () => {
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => openEditModal(user)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50"
                             title="Modifier"
                           >
                             <Edit className="h-4 w-4" />
@@ -333,26 +343,68 @@ const UsersPage: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Précédent
-                </button>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Suivant
-                </button>
+          {/* Mobile Card View (shown only on small screens) */}
+          <div className="md:hidden">
+            {currentUsers.length > 0 ? (
+              <div className="divide-y divide-gray-200">
+                {currentUsers.map((user) => (
+                  <div key={user.id} className="p-4 hover:bg-gray-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                          <User className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{user.nom}</div>
+                          <div className="text-sm text-gray-500 flex items-center mt-1">
+                            <Mail className="h-3 w-3 text-gray-400 mr-1" />
+                            {user.email}
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
+                      >
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                      <div className="text-xs text-gray-500">ID: #{user.id}</div>
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => openEditModal(user)}
+                          className="flex items-center text-sm text-indigo-600 hover:text-indigo-900"
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => openDeleteModal(user)}
+                          className="flex items-center text-sm text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            ) : (
+              <div className="px-4 py-12 text-center">
+                <div className="flex flex-col items-center">
+                  <Frown className="h-12 w-12 text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg">Aucun utilisateur trouvé</p>
+                  <p className="text-gray-400 text-sm">Essayez de modifier vos critères de recherche</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Pagination - already responsive, just adjust padding */}
+          {totalPages > 1 && (
+            <div className="p-4 sm:p-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                   <p className="text-sm text-gray-700">
                     Affichage de <span className="font-medium">{indexOfFirstUser + 1}</span> à{" "}
@@ -360,36 +412,46 @@ const UsersPage: React.FC = () => {
                     <span className="font-medium">{filteredUsers.length}</span> résultats
                   </p>
                 </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-2 sm:px-3 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                    <span className="sr-only">Previous</span>
+                  </button>
+
+                  <div className="hidden md:flex">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
                         className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                           page === currentPage
-                            ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                            ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
                             : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                         }`}
                       >
                         {page}
                       </button>
                     ))}
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                  </nav>
+                  </div>
+
+                  <div className="md:hidden">
+                    <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium">
+                      {currentPage} / {totalPages}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="relative inline-flex items-center px-2 sm:px-3 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                    <span className="sr-only">Next</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -398,15 +460,15 @@ const UsersPage: React.FC = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div className="relative mx-auto p-5 border w-full max-w-sm shadow-lg rounded-xl bg-white">
               <div className="mt-3">
                 <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="mt-4 text-center">
                   <h3 className="text-lg font-medium text-gray-900">Confirmer la suppression</h3>
-                  <div className="mt-2 px-7 py-3">
+                  <div className="mt-2 px-2 sm:px-7 py-3">
                     <p className="text-sm text-gray-500">
                       Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
                       <span className="font-medium text-gray-900">{userToDelete?.nom}</span> ?
@@ -435,8 +497,8 @@ const UsersPage: React.FC = () => {
 
         {/* User Form Modal (Create/Edit) */}
         {showUserModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div className="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
                   {editingUser ? "Modifier l'utilisateur" : "Ajouter un utilisateur"}
@@ -456,7 +518,7 @@ const UsersPage: React.FC = () => {
                     id="nom"
                     value={formData.nom}
                     onChange={(e) => handleInputChange("nom", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                       formErrors.nom ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="Entrez le nom complet"
@@ -473,7 +535,7 @@ const UsersPage: React.FC = () => {
                     id="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                       formErrors.email ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="Entrez l'adresse email"
@@ -489,7 +551,7 @@ const UsersPage: React.FC = () => {
                     id="role"
                     value={formData.role}
                     onChange={(e) => handleInputChange("role", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                       formErrors.role ? "border-red-500" : "border-gray-300"
                     }`}
                   >
@@ -512,7 +574,7 @@ const UsersPage: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {editingUser ? "Modifier" : "Ajouter"}
                   </button>
